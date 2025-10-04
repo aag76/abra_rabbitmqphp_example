@@ -3,12 +3,30 @@
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
+$mydb = new mysqli('127.0.0.1','testUser','12345','testdb');
+
+if($mydb->errno != 0){
+	echo "failed to connect to database: ". $mydb->error . PHP_EOL;
+	end(0);
+}
+echo "successfully connected to database" . PHP_EOL;
 
 function doLogin($username,$password)
 {
     // lookup username in databas
-    // check password
-    return true;
+	// check password
+
+	$query = "SELECT password FROM students WHERE name = '$username' LIMIT 1";
+	$result = $mydb->query($query);
+
+	if($result && $result->num_rows ===1){
+		$row = $result->fetch_assoc();
+		if($row['password']===$password){
+			echo "true";
+			return true;
+		}
+	}
+    return false;
     //return false if not valid
 }
 
