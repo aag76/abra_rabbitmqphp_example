@@ -23,11 +23,17 @@ function doLogin($username,$password)
 	if($result && $result->num_rows ===1){
 		$row = $result->fetch_assoc();
 		if($row['password']===$password){
-			echo "true";
-			return true;
+			$sessionID = bin2hex(random_bytes(32));
+			$expiration = date('Y-m-d H:i:s', time()+3600);
+
+			$insertQ = $mydb->prepare("insert into user_cookies(session_id,username,expiration_time) values(?,?,?)");
+			$insertQ->bind_param("sss",$sessionID,$username,$expiration);
+			$insertQ->execute();
+			
+			return array("returnCode"=>'0',"message"=>"Login successful","sessionId"=>$sessionID);
 		}
 	}
-    return false;
+    return array("returnCode"=>'1',"message"=>"Invalid credentials");
     //return false if not valid
 }
 
@@ -57,6 +63,25 @@ function doRegister($username,$password){
 	else{
 		return array("returnCode"=>'1','message'=>"Failed Registration: ".$stmt->error);
 	}
+}
+function doValidate($sessionId){
+	global $mydb;
+	$query = "select username, expiration_time from sessions where session_id = ? LIMIT 1";
+
+	$stmt = $mydb->prepare($query);
+	$stmt ->binnd_param("s",$sessionId);
+	$stmt->execute();
+	$result = $stmt->get_result();
+
+	if($result && $row = $result->fetch_assoc()){
+		if(strtotime($row['expiration_time'])>time()){
+			return array("returnCode"=>0,"message"=>"Session valid","username"=>$row['username']);
+		}
+	else{
+		return array("returnCode"=>'1',"message"=>"Session expired");
+	}
+	}
+	return array("returnCode"=>'1',"message"=>"Invalid session");
 }
 
 function requestProcessor($request)
