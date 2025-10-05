@@ -17,7 +17,7 @@ function doLogin($username,$password)
     // lookup username in databas
 	// check password
 	
-	$query = "SELECT password FROM users WHERE name = '$username' LIMIT 1";
+	$query = "SELECT password FROM users WHERE username = '$username' LIMIT 1";
 	$result = $mydb->query($query);
 
 	if($result && $result->num_rows ===1){
@@ -29,6 +29,34 @@ function doLogin($username,$password)
 	}
     return false;
     //return false if not valid
+}
+
+function doRegister($username,$password){
+	global $mydb;
+
+	//usercheck
+	$query = "select * from users where username = '$username' limit 1";
+	$result = $mydb->query($query);
+
+	if($result && $result->num_rows>0){
+		return array("returnCode"=>'1','message'=>"Username already exists");
+	}
+	//user addition
+	
+	$stmt = $mydb->prepare("insert into users(username,password) values(?,?)");
+	
+	if(!$stmt){
+		return array("returnCode"=>'1','message'=>"Database error: ".$mydb->error);
+	}
+	//user addition confirmation
+	
+	$stmt->bind_param("ss",$username,$password);
+	if($stmt->execute()){
+		return array("returnCode"=>'0','message'=>"Registration successful");
+	}
+	else{
+		return array("returnCode"=>'1','message'=>"Failed Registration: ".$stmt->error);
+	}
 }
 
 function requestProcessor($request)
@@ -43,6 +71,8 @@ function requestProcessor($request)
   {
     case "login":
       return doLogin($request['username'],$request['password']);
+    case "register":
+      return doRegister($request['username'],$request['password']);
     case "validate_session":
       return doValidate($request['sessionId']);
   }
