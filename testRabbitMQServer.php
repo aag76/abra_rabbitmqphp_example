@@ -3,6 +3,7 @@
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
+/*
 $mydb = new mysqli('100.85.190.111','rmq_user','Rabbit321!','testdb');
 
 if($mydb->errno != 0){
@@ -103,7 +104,7 @@ function requestProcessor($request)
   }
   return array("returnCode" => '0', 'message'=>"Server received request and processed");
 }
-
+*/
 $server = new rabbitMQServer("testRabbitMQ.ini","testServer");
 
 echo "testRabbitMQServer BEGIN".PHP_EOL;
