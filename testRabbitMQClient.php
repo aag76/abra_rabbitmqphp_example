@@ -4,9 +4,9 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-require_once __DIR__ . '/vendor/autoload.php';
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+//require_once __DIR__ . '/vendor/autoload.php';
+//use PhpAmqpLib\Connection\AMQPStreamConnection;
+//use PhpAmqpLib\Message\AMQPMessage;
 
 $apiKey = "X06HO4GPPMMFGJJ";
 $stockSymbols = array("AAPL","GOOGL","AMZN","MSFT","TSLA");
